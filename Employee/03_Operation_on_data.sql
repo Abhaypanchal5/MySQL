@@ -1,3 +1,6 @@
+-- this file contains some sample sql queries to perform various operations on employee table to get comfortable with sql queries and to understand how to use different sql clauses like where, group by, order by, limit etc.
+
+
 -- to slect all the data from employee table
 select * from employee
 
