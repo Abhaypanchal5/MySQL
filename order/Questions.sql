@@ -38,3 +38,14 @@ WHERE total_spent = (
         ) y
     )
 );
+
+select name,total_spent from(
+    SELECT 
+        c.name,
+        SUM(o.total_amount) AS total_spent,
+        DENSE_RANK() OVER (ORDER BY SUM(o.total_amount) DESC) AS rnk
+    FROM customers c
+    JOIN orders o
+      ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name) as ranked
+where rnk = 2
