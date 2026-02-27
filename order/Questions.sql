@@ -88,3 +88,32 @@ select* from (
     ) AS total_spending_per_customer)as ranked
 
     where row_num <= 3
+
+-- Write query to show:Top 2 customers per city based on spending
+-- Must use PARTITION BY
+
+-- Must use ROW_NUMBER()
+
+-- Must filter properly
+SELECT *
+FROM (
+    SELECT 
+        city,
+        name,
+        total_spent,
+        ROW_NUMBER() OVER (
+            PARTITION BY city 
+            ORDER BY total_spent DESC
+        ) AS rnk
+    FROM (
+        SELECT 
+            c.city,
+            c.name,
+            SUM(o.total_amount) AS total_spent
+        FROM customers c
+        JOIN orders o 
+          ON c.customer_id = o.customer_id
+        GROUP BY c.customer_id, c.name, c.city
+    ) AS customer_totals
+) AS ranking
+WHERE rnk <= 2;
