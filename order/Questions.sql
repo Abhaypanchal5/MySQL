@@ -49,3 +49,25 @@ select name,total_spent from(
       ON c.customer_id = o.customer_id
     GROUP BY c.customer_id, c.name) as ranked
 where rnk = 2
+
+-- Find customers whose spending is ABOVE average spending of all customers.
+SELECT name, total_spent
+FROM (
+    SELECT 
+        c.name,
+        SUM(o.total_amount) AS total_spent
+    FROM customers c
+    JOIN orders o
+      ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name
+) AS total_spending_per_customer
+WHERE total_spent > (
+    SELECT AVG(total_spent)
+    FROM (
+        SELECT SUM(o.total_amount) AS total_spent
+        FROM customers c
+        JOIN orders o
+          ON c.customer_id = o.customer_id
+        GROUP BY c.customer_id
+    ) AS avg_table
+);
