@@ -71,3 +71,20 @@ WHERE total_spent > (
         GROUP BY c.customer_id
     ) AS avg_table
 );
+
+-- Write SQL to get Top 3 customers by spending using ROW_NUMBER():
+    -- Must use ROW_NUMBER()
+    -- Must filter where row_num <= 3
+select* from (
+    SELECT name, total_spent, ROW_NUMBER()OVER(ORDER BY total_spent DESC) as row_num
+    FROM (
+        SELECT 
+            c.name,
+            SUM(o.total_amount) AS total_spent
+        FROM customers c
+        JOIN orders o
+        ON c.customer_id = o.customer_id
+        GROUP BY c.customer_id, c.name
+    ) AS total_spending_per_customer)as ranked
+
+    where row_num <= 3
