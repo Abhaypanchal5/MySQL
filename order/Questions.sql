@@ -138,3 +138,27 @@ INSERT INTO orders VALUES
 (118, 6, '2024-07-30', 3500),
 (119, 6, '2024-08-18', 2000);
 
+WITH monthly_spending AS (
+    SELECT 
+        c.customer_id,
+        c.name,
+        DATE_FORMAT(o.order_date, '%Y-%m') AS order_month,
+        SUM(o.total_amount) AS total_spent
+    FROM customers c
+    JOIN orders o 
+      ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name, DATE_FORMAT(o.order_date, '%Y-%m')
+)SELECT *
+FROM (
+    SELECT 
+        customer_id,
+        name,
+        order_month,
+        total_spent,
+        LAG(total_spent) OVER (
+            PARTITION BY customer_id 
+            ORDER BY order_month
+        ) AS previous_month_spent
+    FROM monthly_spending
+) t
+WHERE total_spent > previous_month_spent;
